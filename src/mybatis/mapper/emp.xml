@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="emp">
+	<select id="total" resultType="mybatis.vo.EmpVO">
+		SELECT * FROM employees
+	</select>
+<!-- 사원들의 정보 저장하는 곳! -->
+<insert id="add" parameterType="mybatis.vo.EmpVO">
+	INSERT INTO employees (employee_id, first_name, last_name, email, job_id, hire_date, department_id)
+	VALUES (#{employee_id}, #{first_name}, #{last_name}, #{email},#{job_id}, #{hire_date}, #{department_id})
+</insert>
+
+<!-- 원하는 사원 정보 검색! -->
+<select id="search2" parameterType="Map" resultType="mybatis.vo.EmpVO">
+	SELECT * FROM employees
+	WHERE<if test="searchType == 0">employee_id = #{searchValue}</if> <if test="searchType == 1">first_name LIKE '%'||#{searchValue}||'%'</if>
+		 <if test="searchType == 2">email = #{searchValue}</if> <if test="searchType == 3">department_id = #{searchValue}</if>
+</select>
+
+<select id="search" parameterType="Map" resultType="mybatis.vo.EmpVO">
+	SELECT * FROM employees
+	<where>
+		<choose>
+			<when test="searchType == 0">
+				employee_id = #{searchValue}
+			</when>
+			<when test="searchType == 1">
+				first_name LIKE '%'||#{searchValue}||'%'
+				<!-- MySQL 사용법 : first_name LIKE CONCAT('%',#{searchValue},'%') -->
+			</when>
+			<when test="searchType == 2">
+				UPPER(email) LIKE '%'||UPPER(#{searchValue})||'%'
+			</when>
+			<when test="searchType == 3">
+				department_id = #{searchValue}
+			</when>
+		</choose>
+	</where>
+</select>
+</mapper>
